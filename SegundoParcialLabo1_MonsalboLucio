@@ -1,0 +1,1050 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project>
+	<configuration id="cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510" name="Debug">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+			<provider class="org.eclipse.cdt.managedbuilder.internal.language.settings.providers.GCCBuiltinSpecsDetectorMinGW" console="false" env-hash="766132112434618236" id="org.eclipse.cdt.managedbuilder.core.GCCBuiltinSpecsDetectorMinGW" keep-relative-paths="false" name="CDT GCC Built-in Compiler Settings MinGW" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+				<language-scope id="org.eclipse.cdt.core.gcc"/>
+				<language-scope id="org.eclipse.cdt.core.g++"/>
+			</provider>
+		</extension>
+	</configuration>
+	<configuration id="cdt.managedbuild.config.gnu.mingw.exe.release.227746634" name="Release">
+		<extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
+			<provider copy-of="extension" id="org.eclipse.cdt.ui.UserLanguageSettingsProvider"/>
+			<provider-reference id="org.eclipse.cdt.core.ReferencedProjectsLanguageSettingsProvider" ref="shared-provider"/>
+			<provider-reference id="org.eclipse.cdt.managedbuilder.core.MBSLanguageSettingsProvider" ref="shared-provider"/>
+			<provider class="org.eclipse.cdt.managedbuilder.internal.language.settings.providers.GCCBuiltinSpecsDetectorMinGW" console="false" env-hash="766132112434618236" id="org.eclipse.cdt.managedbuilder.core.GCCBuiltinSpecsDetectorMinGW" keep-relative-paths="false" name="CDT GCC Built-in Compiler Settings MinGW" parameter="${COMMAND} ${FLAGS} -E -P -v -dD &quot;${INPUTS}&quot;" prefer-non-shared="true">
+				<language-scope id="org.eclipse.cdt/*
+ * LinkedList.c
+ *
+ *  Created on: 1 jul. 2021
+ *      Author: Ususario
+ */
+
+#include "Controller.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static Node* getNode(LinkedList* this, int nodeIndex);
+static int addNode(LinkedList* this, int nodeIndex,void* pElement);
+
+/** \brief Crea un nuevo LinkedList en memoria de manera dinamica
+ *
+ *  \param void
+ *  \return LinkedList* Retorna (NULL) en el caso de no conseguir espacio en memoria
+ *                      o el puntero al espacio reservado
+ */
+LinkedList* ll_newLinkedList(void)
+{
+    LinkedList* this = NULL;
+
+    this = (LinkedList*) malloc(sizeof(LinkedList*));
+
+    if(this!=NULL)
+    {
+    	this->pFirstNode = NULL;
+    	this->size = 0;
+    }
+
+    return this;
+}
+
+/** \brief Retorna la cantidad de elementos de la lista
+ *
+ * \param this LinkedList* Puntero a la lista
+ * \return int Retorna (-1) si el puntero es NULL o la cantidad de elementos de la lista
+ *
+ */
+int ll_len(LinkedList* this)
+{
+    int retorno = -1;
+    if(this!=NULL)
+    {
+    	retorno = this->size;
+    }
+
+    return retorno;
+}
+
+
+/** \brief  Obtiene un nodo de la lista
+ *
+ * \param this LinkedList* Puntero a la lista
+ * \param index int Indice del nodo a obtener
+ * \return Node* Retorna  (NULL) Error: si el puntero a la lista es NULL o (si el indice es menor a 0 o mayor al len de la lista)
+                        (pNode) Si funciono correctamente
+ *
+ */
+static Node* getNode(LinkedList* this, int nodeIndex) // nodeindex<ll_lend  nodeIndex >=0
+{
+	Node* pNode;// hacer con while
+	int i;
+
+	pNode = NULL;
+
+	if(this!=NULL && nodeIndex<ll_len(this) && nodeIndex > -1)
+	{
+		pNode = this->pFirstNode;
+
+		for(i = 0; i< nodeIndex; i++)
+		{
+			pNode = pNode->pNextNode;
+		}
+	}
+	return pNode;
+}
+
+/** \brief Agrega y enlaza un nuevo nodo a la lista
+ *
+ * \param this LinkedList* Puntero a la lista
+ * \param nodeIndex int Ubicacion donde se agregara el nuevo nodo
+ * \param pElement void* Puntero al elemento a ser contenido por el nuevo nodo
+ * \return int Retorna  (-1) Error: si el puntero a la lista es NULL o (si el indice es menor a 0 o mayor al len de la lista)
+                        ( 0) Si funciono correctamente
+ *
+ */
+static int addNode(LinkedList* this, int nodeIndex,void* pElement)
+{
+    int returnAux = -1;
+    Node* pNodoAnterior;
+    Node* pNuevoNode;
+
+    if(this != NULL && nodeIndex > -1 && (nodeIndex-1) < ll_len(this))
+    {
+    	pNuevoNode = (Node*) malloc(sizeof(Node));// CREO ESPACIO
+    	pNuevoNode->pElement = pElement; //PONGO LA ESTRUCTURA
+    	pNuevoNode->pNextNode = NULL; // SIGUIENTE ==  NULL
+
+    	if(nodeIndex == 0)
+    	{
+    		pNuevoNode->pNextNode = this->pFirstNode; // PRIMER PUNTERO LL == NULL
+    		this->pFirstNode = pNuevoNode;// NODO PELEMENT Y APUNTA AL SIGUIENTE
+    	}else{
+    		pNodoAnterior = getNode(this, (nodeIndex-1)); // PINDE EL NODO ANTERIOR PARA LINKEAR
+    		pNuevoNode->pNextNode = pNodoAnterior->pNextNode;// SACA EL NULL Y APUNTA AL SIGUIENTE
+    		pNodoAnterior->pNextNode = pNuevoNode;
+    	}
+    	this->size++;
+    	returnAux = 0;
+    }
+    return returnAux;
+}
+
+/** \brief  Agrega un elemento a la lista
+ * \param pList LinkedList* Puntero a la lista
+ * \param pElement void* Puntero al elemento a ser agregado
+ * \return int Retorna  (-1) Error: si el puntero a la lista es NULL
+                        ( 0) Si funciono correctamente
+ *
+ */
+int ll_add(LinkedList* this, void* pElement)
+{
+    int retornoAux;
+    int tamNode;
+
+    retornoAux = -1;
+    tamNode = ll_len(this);
+
+    if(this!=NULL)
+    {
+    	if(tamNode == 0)
+    	{
+    		addNode(this,0,pElement);
+    		retornoAux = 0;
+    	}else{
+    		addNode(this, tamNode, pElement);
+    		retornoAux = 0;
+    	}
+    }
+    return retornoAux;
+}
+
+int ll_sort(LinkedList* this)
+{
+	int i;
+	int j;
+	int tam;
+	char anteriorAutor[30];
+	char autor[30];
+	Node* pNode;
+	eLibro pEstructuraAnterior;
+	eLibro pEstructuraActual;
+	int retorno;
+
+
+	tam = this->size;
+	pNode = this->pFirstNode;
+	pNode = pNode->pNextNode;
+
+	pEstructuraAnterior = *(pNode->pElement);
+	anteriorAutor = (*pEstructuraAnterior).autor;
+
+	for(i=0 ; i<tam ; i++)
+	{
+		for(j=0 ; j<tam ; j++)
+		{
+			pNode = pNode->pNextNode;
+			pEstructuraActual = *(pNode->pElement);
+			autor = (*pEstructuraActual).autor;		//ir rrecorriendo a traves de pNode->pNextNode
+
+			if(strcmp(anteriorAutor,autor)==0)
+			{
+				//cambiar de lugar los elementos
+			}
+		}
+	}
+	return retorno;
+}
+
+int ll_map(LinkedList* this,(int(pFuncion)(eLibro)))
+{
+	Node* pNode;
+	eLibro miLibro;
+	int retorno;
+	int contador;
+	int retorno;
+
+	retorno = -1;
+
+	if(this != NULL)
+	{
+		retorno = 0;
+		pNode = this->pFirstNode;
+		do
+		{
+			pNode = pNode->pNextNode;
+			miLibro = *(pNode->pElement);
+
+			descuentoLibro(miLibro);
+
+			contador ++;
+		}while(contador<this->size);
+	}
+	return retorno;
+}
+
+/*
+ * LinkedList.h
+ *
+ *  Created on: 1 jul. 2021
+ *      Author: Ususario
+ */
+
+#ifndef LINKEDLIST_H_
+#define LINKEDLIST_H_
+
+struct Node
+{
+    void* pElement;                 //puntero al elemento
+    struct Node* pNextNode;         //puntero al prox nodo
+}typedef Node;
+
+struct LinkedList
+{
+    Node* pFirstNode;
+    int size;                       //cada vez que agrego o elimino un elemento size++/--
+}typedef LinkedList;
+#endif
+
+
+
+//Publicas
+LinkedList* ll_newLinkedList(void);
+int ll_len(LinkedList* this);                                       //devuelve el valor del campo int size
+Node* test_getNode(LinkedList* this, int nodeIndex);
+int test_addNode(LinkedList* this, int nodeIndex,void* pElement);
+int ll_add(LinkedList* this, void* pElement);
+void* ll_get(LinkedList* this, int index);
+int ll_set(LinkedList* this, int index,void* pElement);
+int ll_remove(LinkedList* this,int index);
+int ll_clear(LinkedList* this);
+int ll_deleteLinkedList(LinkedList* this);
+int ll_indexOf(LinkedList* this, void* pElement);
+int ll_isEmpty(LinkedList* this);
+int ll_push(LinkedList* this, int index, void* pElement);
+void* ll_pop(LinkedList* this,int index);                           //elimina un elemento (los enlaces a ese elemento) y devuelve un puntero a ese elemento
+int ll_contains(LinkedList* this, void* pElement);
+int ll_containsAll(LinkedList* this,LinkedList* this2);
+LinkedList* ll_subList(LinkedList* this,int from,int to);
+LinkedList* ll_clone(LinkedList* this);
+
+
+/*
+ ============================================================================
+ Name        : SegundoParcialLabo1_MonsalboLucio.c
+ Author      : Monsalbo Lucio
+ Version     :
+ Copyright   : Your copyright notice
+ Description : Hello World in C, Ansi-style
+ ============================================================================
+ */
+
+
+#include "Controller.h"
+
+int main(void)
+{
+	int menu;
+
+	LinkedList miLinkedList;
+
+	miLinkedList = ll_newLinkedList();
+
+	do
+	{
+		menu = mostrarMenu();
+		switch(menu)
+		{
+		case 1:
+			controller_cargarDesdeTexto(miLinkedList);
+			break;
+
+		case 2:
+			controller_ordenarLista(miLinkedList);
+			break;
+
+		case 3:
+			controller_mostrarLibros(miLinkedList);
+			break;
+
+		case 4:
+			controller_descuento(miLinkedList);
+			break;
+
+		case 5:
+			controller_guardar(miLinkedList);
+			break;
+		}
+	}while(menu>6 && menu<0);
+
+	return EXIT_SUCCESS;
+}
+
+/*
+ * Controler.c
+ *
+ *  Created on: 1 jul. 2021
+ *      Author: Ususario
+ */
+
+#include "Controller.h"
+
+int mostrarMenu(void)
+{
+	int respuesta;
+
+	respuesta = -1;
+
+	printf("/nIngrese opcion:\n\n"
+			"1) Cargar archivo\n"
+			"2) Ordenar por autor\n"
+			"3) Mostrar libros cargados\n"
+			"4) Aplicar descuentos\n"
+			"5) Guardar archivo\n");
+	scanf("%d", &respuesta);
+
+	do
+	{
+
+		if(respuesta < 1 || respuesta > 5)
+		{
+			printf("\n\nERROR: Ingrese opcion valida:"
+					"/n1) Cargar archivo\n"
+					"2) Ordenar por autor\n"
+					"3) Mostrar libros cargados\n"
+					"4) Aplicar descuentos\n"
+					"5) Guardar archivo\n");
+			scanf("%d", &respuesta);
+		}
+	}while(respuesta < 1 || respuesta > 5);
+
+	return respuesta;
+}
+
+void controller_cargarDesdeTexto(LinkedList* miLinkedList)
+{
+	FILE* pFile;
+	char path[30];
+	int parcer;
+
+	if(miLinkedList == NULL)
+	{
+		printf("ERROR, el archivo no puedo ser abierto debido a la no exixtencia de la linkedlist");
+	}else{
+
+		printf("ingrese el nombre del archivo que desea abrir");
+		scanf("%s",path);
+
+		pFile = fopen(path,"r");// cargoArchivoEnBinario
+
+		parcer = parser_eLibroFromText(pFile ,miLinkedList);
+		if(parcer == -1)
+		{
+			printf("ERROR al intentar parcear, intente nuevamente");
+		}
+	}
+
+	fclose(pFile);
+
+}// ABRE COPIA CIERRA.
+
+void controller_ordenarLista(LinkedList* miLinkedList)
+{
+
+}
+
+void controller_mostrarLibros(LinkedList* miLinkedList)
+{
+	int contador;
+	int id;
+	char titulo[50];
+	char autor[30];
+	float precio;
+	int editorialId;
+	Node* pNode;
+	void* miLibro;
+
+	contador = 0;
+	pNode = miLinkedList->pFirstNode;
+
+	do
+	{
+		pNode = pNode->pNextNode;
+		contador ++;
+		miLibro = pNode->pElement;
+
+		eLibro_getId(miLibro,&id);
+		eLibro_getTitulo(miLibro,titulo);
+		eLibro_getAutor(miLibro,autor);
+		eLibro_getPrecio(miLibro,&precio);
+		eLibro_getEditorialId(miLibro,&editorialId);
+
+		printf("\nel libro N %d, %s , del autor %s tiene un precio de %2f, y es de la editorial %s\n",id, titulo, autor, precio, editorialId);
+	}while(miLinkedList->size<contador);
+}
+
+
+void controller_descuento(LinkedList* miLinkedList)
+{
+	int retorno;
+	eLibro miLibro;
+
+	retorno = ll_map(miLinkedList ,descuentoLibro(miLibro));
+
+	if(retorno == -1)
+	{
+		printf("ERROR, no se a podido aplicar correctamente los descuentos");
+	}
+}
+
+void controller_guardar(LinkedList* miLinkedList)
+{
+	FILE* pFile;
+	int contador;
+	int id;
+	char titulo[50];
+	char autor[30];
+	float precio;
+	int editorialId;
+	Node* pNode;
+	void* miLibro;
+	int tamTitulo;
+	int tamAutor;
+	int tamEditorialId;
+	int cantidadId;
+	int cantidadTitulo;
+	int cantidadAutor;
+	int cantidadPrecio;
+	int cantidadEditorialId;
+	int validacion;
+
+	contador = 0;
+	pNode = miLinkedList->pFirstNode;
+
+	fopen("mapeado.csv","w");
+
+	do
+	{
+		pNode = pNode->pNextNode;
+		contador ++;
+		miLibro = pNode->pElement;
+
+
+		eLibro_getId(miLibro,&id);
+		eLibro_getTitulo(miLibro,titulo);
+		eLibro_getAutor(miLibro,autor);
+		eLibro_getPrecio(miLibro,&precio);
+		eLibro_getEditorialId(miLibro,&editorialId);
+
+		tamTitulo = strlen(titulo);
+		tamAutor = strlen(autor);
+		tamEditorialId = strlen(editorialId);
+
+		cantidadId= fwrite(id,sizeof(int),1,pFile);
+		if(cantidadId != 1)
+		{
+			validacion = -1;
+		}
+		cantidadTitulo = fwrite(titulo,sizeof(char),tamTitulo,pFile);
+		if(tamTitulo != cantidadTitulo)
+		{
+			validacion = -1;
+		}
+		cantidadAutor = fwrite(autor,sizeof(char),tamAutor,pFile);
+		if(tamAutor != cantidadAutor)
+		{
+			validacion = -1;
+		}
+		cantidadPrecio = fwrite(precio,sizeof(float),1,pFile);
+		if(cantidadPrecio != 1)
+		{
+			validacion = -1;
+		}
+		cantidadEditorialId = fwrite(editorialId,sizeof(char),tamEditorialId,pFile);
+		if(tamEditorialId != cantidadEditorialId)
+		{
+			validacion = -1;
+		}
+
+	}while(contador < 31);
+
+	if(validacion == -1)
+	{
+		printf("ERROR al intentar subir los datos al archivo");
+	}
+
+	fclose(pFile);
+}
+
+/*
+ * Controler.h
+ *
+ *  Created on: 1 jul. 2021
+ *      Author: Ususario
+ */
+
+#ifndef CONTROLLER_H_
+#define CONTROLLER_H_
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "LinkedList.h"
+#include "eLibro.h"
+#include <string.h>
+
+int mostrarMenu(void);
+
+/** \brief Carga los datos de los empleados desde el archivo data.csv (modo texto).
+ *
+ * \param path char*
+ * \param pArrayListEmployee LinkedList*
+ * \return int
+ *
+ */
+void controller_cargarDesdeTexto(LinkedList* miLinkedList);
+controller_ordenarLista();
+controller_mostrarLibros(LinkedList* miLinkedList);
+controller_guardar(LinkedList* miLinkedList);
+
+#endif /* CONTROLLER_H_ */
+
+/*
+ * eLibro.c
+ *
+ *  Created on: 1 jul. 2021
+ *      Author: Ususario
+ */
+
+#include "eLibro.h"
+
+
+int parser_eLibroFromText(FILE* pFile , LinkedList* miLinkedList)
+{
+	char id[30];
+	char titulo[50];
+	char autor[30];
+	char precio[30];
+	char editorialId[30];
+	eLibro* miLibro;
+	int contador;
+	int validacion;
+	int retorno;
+
+	contador = 0;
+	retorno = -1;
+
+	if(pFile != NULL && miLinkedList != NULL)
+	{
+		fscanf(pFile,"%[^,],%[^,],%[^,],%[^,],%[^\n]\n",id, titulo, autor,precio,editorialId);//falsa lectura
+
+		do
+		{
+			contador++;
+			if(fscanf(pFile,"%[^,],%[^,],%[^,],%[^,],%[^\n]\n",id, titulo, autor,precio,editorialId)==5)
+			{
+				miLibro = libro_nuevosParametros(id, titulo, autor,precio,editorialId);
+				miLinkedList->size = miLinkedList->size++;
+				if(miLibro == NULL)
+				{
+					printf("ERROR al intentar cargar la linea N %d",contador);
+					retorno = 1;
+				}
+
+				validacion = ll_add(miLinkedList, miLibro);
+				if(validacion!=0)
+				{
+					printf("ERROR, no se pudo cargar correctamente los datos");
+					retorno = 1;
+				}
+			}
+		}while(!feof(pFile));
+		if(retorno == -1)
+		{
+			retorno = 0;
+		}
+	}
+    return retorno;
+}
+
+eLibro* libro_nuevosParametros(char id,char titulo, char autor, char precio,char editorialID)
+{
+	eLibro * nuevoLibro;
+
+	nuevoLibro = eLibro_nuevo();
+
+	if(!(eLibro_setId(nuevoLibro,(atoi(id))==0 ||
+			eLibro_setTitulo(nuevoLibro,titulo)==0 ||
+			eLibro_setAutor(nuevoLibro,autor)==0 ||
+			eLibro_setPrecio(nuevoLibro,atoi(precio))==0 ||
+			eLibro_setEditorialId(nuevoLibro,atoi(editorialID))==0)))
+	{
+		nuevoLibro = NULL;
+	}
+
+
+	return nuevoLibro;
+}
+
+LinkedList* eLibro_nuevo(void)
+{
+
+	return (LinkedList) malloc(sizeof(LinkedList));
+}
+
+int eLibro_setId(eLibro* this,int id)
+{
+	int retorno;
+	retorno = -1;
+
+	if(this != NULL && id>0)
+	{
+		this->id = id;
+		retorno = 0;
+	}
+
+	return retorno;
+}
+
+int eLibro_getId(eLibro* this, int* id)
+{
+	int retorno;
+
+	retorno = -1;
+
+	if(this != NULL && id != NULL)
+	{
+		*id = this->id;
+		retorno = 0;
+	}
+
+	return retorno;
+}
+
+int eLibro_setTitulo(eLibro* this,char titulo)
+{
+	int retorno;
+
+	retorno = -1;
+
+	if(this != NULL && titulo != NULL && strlen(titulo)>0)
+	{
+		strcpy(this->titulo, titulo);
+		retorno = 0;
+	}
+	return retorno;
+}
+
+
+int eLibro_getTitulo(eLibro* this,char* titulo)
+{
+	int retorno;
+
+	retorno = -1;
+
+	if(this != NULL && titulo != NULL && strlen(titulo)>0)
+	{
+		strcpy(titulo, this->titulo);
+		retorno = 0;
+	}
+	return retorno;
+}
+
+int eLibro_setAutor(eLibro* this,char autor)
+{
+	int retorno;
+
+	retorno = -1;
+
+	if(this != NULL && autor != NULL && strlen(autor)>0)
+	{
+		strcpy(this->autor, autor);
+		retorno = 0;
+	}
+	return retorno;
+}
+
+
+char eLibro_getAutor(eLibro* this,char* autor)
+{
+	int retorno;
+
+	retorno = -1;
+
+	if(this != NULL && autor != NULL && strlen(autor)>0)
+	{
+		strcpy(autor, this->autor);
+		retorno = 0;
+	}
+	return retorno;
+}
+
+int eLibro_setPrecio(eLibro* this,float precio)
+{
+	int retorno;
+
+	if(this != NULL && precio>0)
+	{
+		this->precio = precio;
+		retorno = 0;
+	}
+
+	return retorno;
+}
+
+int eLibro_getPrecio(eLibro* this, float* precio)
+{
+	int retorno;
+
+	retorno = -1;
+
+	if(this != NULL && precio != NULL)
+	{
+		*precio = this->precio;
+		retorno = 0;
+	}
+
+	return retorno;
+}
+
+int eLibro_setEditorialId(eLibro* this,int editorialId)
+{
+	int retorno;
+
+	if(this != NULL && editorialId>0)
+	{
+		this->editorialId = editorialId;
+		retorno = 0;
+	}
+
+	return retorno;
+}
+
+int eLibro_getEditorialId(eLibro* this, char EditorialId)
+{
+	int retorno;
+
+	retorno = -1;
+
+	if(this != NULL && EditorialId != NULL)
+	{
+		switch(EditorialId)
+		{
+		case 1:
+			strcpy(EditorialId, "PLANETA");
+			break;
+
+		case 2:
+			strcpy(EditorialId, "SIGLO XXI EDITORES");
+			break;
+
+		case 3:
+			strcpy(EditorialId, "PEARSON");
+			break;
+
+		case 4:
+			strcpy(EditorialId, "MINOTAURO");
+			break;
+
+		case 5:
+			strcpy(EditorialId, "SALAMANDRA");
+			break;
+
+		case 6:
+			strcpy(EditorialId, "PENGUIN BOOKS");
+			break;
+		}
+		retorno = 0;
+	}
+	return retorno;
+}
+
+int descuentoLibro(eLibro miLibro)
+{
+	int retorno;
+	int precioDescuento;
+
+	retorno = -1;
+
+	if(miLibro == NULL)
+	{
+		retorno = 0;
+		if((*miLibro).precio > 299 && (*miLibro).editorialId == 1)
+		{
+			precioDescuento = (*miLibro).precio;
+			precioDescuento = (precioDescuento*20)/100;
+			(*miLibro).precio = precioDescuento;
+		}else{
+			if((*miLibro).precio > 199 && (*miLibro).editorialId == 2)
+			{
+				precioDescuento = (*miLibro).precio;
+				precioDescuento = (precioDescuento*10)/100;
+				(*miLibro).precio = precioDescuento;
+			}
+		}
+	}
+	return retorno;
+}
+
+
+/*
+ * eLibro.h
+ *
+ *  Created on: 1 jul. 2021
+ *      Author: Ususario
+ */
+
+#ifndef ELIBRO_H_
+#define ELIBRO_H_
+
+#include "Controller.h"
+
+typedef struct
+{
+	int id;
+	char titulo[50];
+	char autor[30];<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>SegundoParcialLabo1_MonsalboLucio</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+	</natures>
+</projectDescription>
+
+id,titulo,autor,precio,editorialId
+1,Manuel Belgrano,Pigna,310,Planeta
+2,Matematica... �estas ahi?,Paenza,350,SIGLO XXI EDITORES
+3,Como programar en Java,Deitel & Deitel,1000,Pearson
+4,El se�or de los anillos - La comunidad del anillo,Tolkien,800,Minotauro
+5,Harry Potter Y La Piedra Filosofal,Rowling,800,SALAMANDRA
+6,Las aventuras de pinocho,Collodi Carlo,300,PENGUIN BOOKS
+7,La voz del gran jefe,Pigna,500,Planeta
+8,Matematica... �estas ahi? Episodio 2,Paenza,150,SIGLO XXI EDITORES
+9,Como programar en C++,Deitel & Deitel,1000,Pearson
+10,El se�or de los anillos - Las dos torres,Tolkien,800,Minotauro
+11,Harry Potter y la camara secreta,Rowling,800,SALAMANDRA
+12,El mago de Oz,Baum Frank,300,PENGUIN BOOKS
+13,La vida por la patria,Pigna,250,Planeta
+14,Matematica... �estas ahi? Episodio 3.14,Paenza,350,SIGLO XXI EDITORES
+15,El se�or de los anillos - El retorno del rey,Tolkien,800,Minotauro
+16,Harry Potter y el prisionero de Azkaban,Rowling,800,SALAMANDRA
+17,Los Viajes De Gulliver,Swift Jonathan,300,PENGUIN BOOKS
+18,Libertadores de America,Pigna,500,Planeta
+19,Matematica... �estas ahi? Episodio 100,Pigna,150,SIGLO XXI EDITORES
+20,El hobbit,Tolkien,800,Minotauro
+21,Harry Potter y el c�liz de fuego,Rowling,800,SALAMANDRA
+22,Alicia En El Pais De Las Maravillas,Carroll Lewis,300,PENGUIN BOOKS
+23,Los mitos de la historia argentina 1,Pigna,500,Planeta
+24,Harry Potter y la Orden del Fenix,Rowling,800,SALAMANDRA
+25,Los mitos de la historia argentina 2,Pigna,450,Planeta
+26,Harry Potter y el misterio del principe,Rowling,800,SALAMANDRA
+27,Los mitos de la historia argentina 3,Pigna,375,Planeta
+28,Harry Potter y las Reliquias de la Muerte,Rowling,800,SALAMANDRA
+29,Los mitos de la historia argentina 4,Pigna,250,Planeta
+30,Los mitos de la historia argentina 5,Pigna,270,Planeta
+
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+		<cconfiguration id="cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510" moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.PE64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510" name="Debug" parent="cdt.managedbuild.config.gnu.mingw.exe.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.exe.debug.1551115989" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.exe.debug">
+							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.exe.debug.1864773074" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.exe.debug"/>
+							<builder buildPath="${workspace_loc:/SegundoParcialLabo1_MonsalboLucio}/Debug" id="cdt.managedbuild.tool.gnu.builder.mingw.base.622408648" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.exe.debug.1663272785" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.exe.debug">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1449036917" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.1201025740" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.debug.587302377" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.debug">
+								<option id="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level.351275290" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option defaultValue="gnu.cpp.compiler.debugging.level.max" id="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level.943367151" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.debug.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.580336371" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.mingw.exe.debug.option.optimization.level.1920024081" name="Optimization Level" superClass="gnu.c.compiler.mingw.exe.debug.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option defaultValue="gnu.c.debugging.level.max" id="gnu.c.compiler.mingw.exe.debug.option.debugging.level.1836902190" name="Debug Level" superClass="gnu.c.compiler.mingw.exe.debug.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1691941449" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug.719774466" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.debug">
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.2128226781" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug.868421080" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.debug"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.mingw.exe.release.227746634">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.mingw.exe.release.227746634" moduleId="org.eclipse.cdt.core.settings" name="Release">
+				<externalSettings/>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.PE64" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactName="${ProjName}" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release" cleanCommand="rm -rf" description="" id="cdt.managedbuild.config.gnu.mingw.exe.release.227746634" name="Release" parent="cdt.managedbuild.config.gnu.mingw.exe.release">
+					<folderInfo id="cdt.managedbuild.config.gnu.mingw.exe.release.227746634." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.mingw.exe.release.520254255" name="MinGW GCC" superClass="cdt.managedbuild.toolchain.gnu.mingw.exe.release">
+							<targetPlatform id="cdt.managedbuild.target.gnu.platform.mingw.exe.release.985726182" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.mingw.exe.release"/>
+							<builder buildPath="${workspace_loc:/SegundoParcialLabo1_MonsalboLucio}/Release" id="cdt.managedbuild.tool.gnu.builder.mingw.base.952911850" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="CDT Internal Builder" superClass="cdt.managedbuild.tool.gnu.builder.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.mingw.exe.release.123302550" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.mingw.exe.release">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.238405723" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.113372764" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.release.1748616898" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.exe.release">
+								<option id="gnu.cpp.compiler.mingw.exe.release.option.optimization.level.1804373584" name="Optimization Level" superClass="gnu.cpp.compiler.mingw.exe.release.option.optimization.level" useByScannerDiscovery="false" value="gnu.cpp.compiler.optimization.level.most" valueType="enumerated"/>
+								<option defaultValue="gnu.cpp.compiler.debugging.level.none" id="gnu.cpp.compiler.mingw.exe.release.option.debugging.level.833668351" name="Debug Level" superClass="gnu.cpp.compiler.mingw.exe.release.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.release.2039250358" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.release">
+								<option defaultValue="gnu.c.optimization.level.most" id="gnu.c.compiler.mingw.exe.release.option.optimization.level.808241418" name="Optimization Level" superClass="gnu.c.compiler.mingw.exe.release.option.optimization.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<option defaultValue="gnu.c.debugging.level.none" id="gnu.c.compiler.mingw.exe.release.option.debugging.level.1261982652" name="Debug Level" superClass="gnu.c.compiler.mingw.exe.release.option.debugging.level" useByScannerDiscovery="false" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1210367048" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.release.1726337077" name="MinGW C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.mingw.exe.release">
+								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1178859708" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.release.1536773742" name="MinGW C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.mingw.exe.release"/>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+	</storageModule>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="SegundoParcialLabo1_MonsalboLucio.cdt.managedbuild.target.gnu.mingw.exe.1840669415" name="Executable" projectType="cdt.managedbuild.target.gnu.mingw.exe"/>
+	</storageModule>
+	<storageModule moduleId="scannerConfiguration">
+		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510;cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510.;cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.debug.580336371;cdt.managedbuild.tool.gnu.c.compiler.input.1691941449">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+		<scannerConfigBuildInfo instanceId="cdt.managedbuild.config.gnu.mingw.exe.release.227746634;cdt.managedbuild.config.gnu.mingw.exe.release.227746634.;cdt.managedbuild.tool.gnu.c.compiler.mingw.exe.release.2039250358;cdt.managedbuild.tool.gnu.c.compiler.input.1210367048">
+			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
+		</scannerConfigBuildInfo>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+</cproject>
+	float precio;
+	int editorialId;
+}eLibro;
+
+int parser_eLibroFromText(FILE* pFile , LinkedList* miLinkedList);
+eLibro* libro_nuevosParametros(char id,char titulo, char autor, char precio,char editorialID);
+eLibro* eLibro_nuevo(void);
+int eLibro_setId(eLibro* this,int id);
+int eLibro_getId(eLibro* this, int* id);
+int eLibro_setTitulo(eLibro* this,char titulo);
+int eLibro_getTitulo(eLibro* this,char* titulo);
+int eLibro_setAutor(eLibro* this,char autor);
+char eLibro_getAutor(eLibro* this,char* autor);
+int eLibro_setPrecio(eLibro* this,float precio);
+int eLibro_getPrecio(eLibro* this, float* precio);
+int eLibro_setEditorialId(eLibro* this,int editorialId);
+int eLibro_getEditorialId(eLibro* this, char EditorialId);
+#endif /* ELIBRO_H_ */
+.core.gcc"/>
+				<language-scope id="org.eclipse.cdt.core.g++"/>
+			</provider>
+		</extension>
+	</configuration>
+</project>
+eclipse.preferences.version=1
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/CPATH/delimiter=;
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/CPATH/operation=remove
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/C_INCLUDE_PATH/delimiter=;
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/C_INCLUDE_PATH/operation=remove
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/append=true
+environment/buildEnvironmentInclude/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/appendContributed=true
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/LIBRARY_PATH/delimiter=;
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/LIBRARY_PATH/operation=remove
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/append=true
+environment/buildEnvironmentLibrary/cdt.managedbuild.config.gnu.mingw.exe.debug.1782048510/appendContributed=true
